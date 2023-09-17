@@ -1,0 +1,26 @@
+{
+  "name": "dropper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lehzhu/dropper.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lehzhu/dropper/issues"
+  },
+  "homepage": "https://github.com/lehzhu/dropper#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.2",
+    "twilio": "^4.17.0"
+  }
+}
