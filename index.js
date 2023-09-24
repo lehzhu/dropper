@@ -6,6 +6,7 @@ const twilio = require('twilio');
 const accountSid = 'ACe991ddbaf5c99558d90349b2eee7a5a4';
 const authToken = 'e63bfd308f17ee4d1257bd7692dbc48c';
 const client = new twilio(accountSid, authToken);
+const twilioNumber = '+12565989092'
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -14,7 +15,17 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const pickups = [];
 
 // In-memory list of subscribed phone numbers
-const subscribedNumbers = ['+16479165156']; // Replace with actual numbers
+const subscribedNumbers = ['+16479165156', '+16475760258']; // Replace with actual number
+
+//Bootup message 
+const instructionMessage = "Use this format for your requests: 'Drop - Item - Coordinates - Deadline - Price' or 'Pickup - Item";
+Numbers.forEach(number => { 
+  client.messages.create({ 
+    body: instructionMessage,
+    to: number,
+    from:  twilioNumber
+  });
+});
 
 // Endpoint to receive SMS via Twilio webhook
 app.post('/sms', async (req, res) => {
@@ -35,7 +46,7 @@ app.post('/sms', async (req, res) => {
   for (let number of subscribedNumbers) {
     await client.messages.create({
       body: notificationText,
-      from: '+12565989092', // Replace with your Twilio number
+      from: twilioNumber, 
       to: number
     }).catch(err => console.log(err));
   }
