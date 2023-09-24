@@ -4,7 +4,7 @@ const twilio = require('twilio');
 
 // Initialize Twilio client
 const accountSid = 'ACe991ddbaf5c99558d90349b2eee7a5a4';
-const authToken = 'e63bfd308f17ee4d1257bd7692dbc48c';
+const authToken = '60eb6d81378cb1cc5b9d2b702e9e0007';
 const client = new twilio(accountSid, authToken);
 const twilioNumber = '+12565989092'
 
@@ -15,11 +15,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const pickups = [];
 
 // In-memory list of subscribed phone numbers
-const subscribedNumbers = ['+16479165156', '+16475760258']; // Replace with actual number
+const subscribedNumbers = ['+16479165156']; // Replace with actual number
 
 //Bootup message 
 const instructionMessage = "Use this format for your requests: 'Drop - Item - Coordinates - Deadline - Price' or 'Pickup - Item";
-numbers.forEach(number => { 
+subscribedNumbers.forEach(number => { 
   client.messages.create({ 
     body: instructionMessage,
     to: number,
