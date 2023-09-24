@@ -19,7 +19,7 @@ const subscribedNumbers = ['+16479165156', '+16475760258']; // Replace with actu
 
 //Bootup message 
 const instructionMessage = "Use this format for your requests: 'Drop - Item - Coordinates - Deadline - Price' or 'Pickup - Item";
-Numbers.forEach(number => { 
+numbers.forEach(number => { 
   client.messages.create({ 
     body: instructionMessage,
     to: number,
@@ -47,7 +47,7 @@ app.post('/sms', (req, res) => {
     };
   }
   //Parse incoming if pick 
-  if (incomingMessage.startsWith('Pick')) {
+  else if (incomingMessage.startsWith('Pick')) {
     const itemName = incomingMessage.split('-')[1].trim();
     
     // Check if this item is available for pickup
@@ -61,7 +61,7 @@ app.post('/sms', (req, res) => {
         });
     }
   }
-  if (incomingMessage === 'Y') {
+  else if (incomingMessage === 'Y') {
     const timeLeftInMinutes = (dropInfo.deadlineTimestamp - Date.now()) / (60 * 1000);
     const responseMessage = `Someone is interested in '${dropInfo.itemName}'. Deadline in ${Math.round(timeLeftInMinutes)} minutes.`;
     client.messages.create({
@@ -70,8 +70,20 @@ app.post('/sms', (req, res) => {
         from: 'yourTwilioNumber'
     });
   }
+  else { 
+    const messageToBroadcast = `New pickup available at coordinates: ${incomingMessage}. description: undefined`;
+    console.log(messageToBroadcast);
+    // Code to send SMS to other subscribed numbers (using Twilio API or other methods)
+    // Respond to the sender
+    res.set('Content-Type', 'text/xml');
+    res.send(`
+      <Response>
+        <Message>Your pickup has been broadcasted.</Message>
+      </Response>
+    `);
+  }
 }
-)
+);
 
 // Start the server
 const port = 3000;
