@@ -27,40 +27,54 @@ Numbers.forEach(number => {
   });
 });
 
-// Endpoint to receive SMS via Twilio webhook
-app.post('/sms', async (req, res) => {
-  // Parse the incoming SMS
-  const messageBody = req.body.Body;
-  const messageArray = messageBody.split(';');
-  const coordinates = messageArray[0];
-  const description = messageArray[1];
+let dropInfo = {}; 
+app.post('/sms', (req, res) => { 
+  const incomingMessage = req.body.Body;
+  const fromNumber = req.body.From; 
 
-  // Store the pickup data in-memory
-  pickups.push({
-    coordinates: coordinates,
-    description: description,
-  });
-
-  // Notify all other users
-  const notificationText = `New pickup available at coordinates: ${coordinates}. Description: ${description}`;
-  for (let number of subscribedNumbers) {
-    await client.messages.create({
-      body: notificationText,
-      from: twilioNumber, 
-      to: number
-    }).catch(err => console.log(err));
+  // Parse the incoming message if drop 
+  if (incomingMessage.startsWith('Drop')) {
+    // Parse the message and store the drop information
+    const parts = incomingMessage.split('-').map(part => part.trim());
+    const deadlineInHours = parseFloat(parts[3]);
+    const deadlineTimestamp = Date.now() + deadlineInHours * 60 * 60 * 1000; // Convert to UTC timestamp
+    dropInfo = {
+        itemName: parts[1],
+        coordinates: parts[2],
+        deadlineTimestamp,
+        price: parts[4],
+        dropNumber: fromNumber
+    };
   }
-
-  // Respond to Twilio
-  const twiml = new twilio.twiml.MessagingResponse();
-  twiml.message('Your pickup has been recorded.');
-  res.writeHead(200, {'Content-Type': 'text/xml'});
-  res.end(twiml.toString());
-});
+  //Parse incoming if pick 
+  if (incomingMessage.startsWith('Pick')) {
+    const itemName = incomingMessage.split('-')[1].trim();
+    
+    // Check if this item is available for pickup
+    if (dropInfo.itemName === itemName) {
+        const timeLeftInMinutes = (dropInfo.deadlineTimestamp - Date.now()) / (60 * 1000);
+        const responseMessage = `'${itemName}' available for pickup at ${dropInfo.coordinates}. Deadline in ${Math.round(timeLeftInMinutes)} minutes. $${dropInfo.price} asking. Interested? Y/N`;
+        client.messages.create({
+            body: responseMessage,
+            to: fromNumber,
+            from: 'yourTwilioNumber'
+        });
+    }
+  }
+  if (incomingMessage === 'Y') {
+    const timeLeftInMinutes = (dropInfo.deadlineTimestamp - Date.now()) / (60 * 1000);
+    const responseMessage = `Someone is interested in '${dropInfo.itemName}'. Deadline in ${Math.round(timeLeftInMinutes)} minutes.`;
+    client.messages.create({
+        body: responseMessage,
+        to: dropInfo.dropNumber,
+        from: 'yourTwilioNumber'
+    });
+  }
+}
+)
 
 // Start the server
 const port = 3000;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-
