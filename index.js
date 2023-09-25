@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const pickups = [];
 
 // In-memory list of subscribed phone numbers
-const subscribedNumbers = ['+16479165156']; // Replace with actual number
+const subscribedNumbers = ['+16479165156', '+16475760258']; // Replace with actual number
 
 //Bootup message 
 const instructionMessage = "Use this format for your requests: 'Drop - Item - Coordinates - Deadline - Price' or 'Pickup - Item";
