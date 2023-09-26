@@ -85,7 +85,7 @@ app.post('/sms', (req, res) => {
 }
 );
 
-// Start the server
+// Start the server here
 const port = 3000;
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
